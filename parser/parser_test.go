@@ -436,6 +436,8 @@ func TestParsingHashLiterals(t *testing.T) {
 // Helper functionss
 //
 func testParserErrors(t *testing.T, p *Parser) {
+	t.Helper()
+
 	if len(p.Errors()) != 0 {
 		log.Printf("parser has %d erros", len(p.Errors()))
 		for _, err := range p.Errors() {
@@ -446,6 +448,8 @@ func testParserErrors(t *testing.T, p *Parser) {
 }
 
 func testLetStatement(t *testing.T, expected string, actual ast.Statement) {
+	t.Helper()
+
 	require.Equal(t, "let", actual.TokenLiteral(), "Wrong TokenLiternal")
 	letStatement, ok := actual.(*ast.LetStatement)
 	require.True(t, ok, "Wrong type")
@@ -454,6 +458,8 @@ func testLetStatement(t *testing.T, expected string, actual ast.Statement) {
 }
 
 func testIdentifier(t *testing.T, expected string, actual ast.Expression) {
+	t.Helper()
+
 	identifier, ok := actual.(*ast.Identifier)
 	require.True(t, ok, "Expression is not identifier, %s", actual)
 	require.Equal(t, expected, identifier.Value, "Wrong value")
@@ -461,6 +467,8 @@ func testIdentifier(t *testing.T, expected string, actual ast.Expression) {
 }
 
 func testIntegerLiteral(t *testing.T, expected int64, actual ast.Expression) {
+	t.Helper()
+
 	integer, ok := actual.(*ast.IntegerLiteral)
 	require.True(t, ok, "Expression is not integer literal, %s", actual)
 	require.Equal(t, expected, integer.Value, "Wrong value")
@@ -468,6 +476,8 @@ func testIntegerLiteral(t *testing.T, expected int64, actual ast.Expression) {
 }
 
 func testStringLiteral(t *testing.T, expected string, actual ast.Expression) {
+	t.Helper()
+
 	str, ok := actual.(*ast.StringLiteral)
 	require.True(t, ok, "Expression is not string literal, %s", actual)
 	require.Equal(t, expected, str.Value, "Wrong value")
@@ -475,6 +485,8 @@ func testStringLiteral(t *testing.T, expected string, actual ast.Expression) {
 }
 
 func testBoolLiteral(t *testing.T, expected bool, actual ast.Expression) {
+	t.Helper()
+
 	boolean, ok := actual.(*ast.Boolean)
 	require.True(t, ok, "Expression is not boolean literal, %s", actual)
 	require.Equal(t, expected, boolean.Value, "Wrong value")
@@ -482,6 +494,8 @@ func testBoolLiteral(t *testing.T, expected bool, actual ast.Expression) {
 }
 
 func testLiteralExpression(t *testing.T, expected interface{}, actual ast.Expression) {
+	t.Helper()
+
 	switch v := expected.(type) {
 	case int:
 		testIntegerLiteral(t, int64(v), actual)
@@ -502,6 +516,8 @@ func testLiteralExpression(t *testing.T, expected interface{}, actual ast.Expres
 }
 
 func testInfixExpression(t *testing.T, left interface{}, operator string, right interface{}, actual ast.Expression) {
+	t.Helper()
+
 	actualOperator, ok := actual.(*ast.InfixExpression)
 	require.True(t, ok, "Expression is not infix expression, %s", actual)
 	testLiteralExpression(t, left, actualOperator.Left)
