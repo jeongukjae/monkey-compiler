@@ -8,7 +8,7 @@ wasm:
 	GOOS=js GOARCH=wasm go build -o docs/repl_lib.wasm wasm/main.go
 
 build:
-	go build -v ./...
+	go build -v $(SRCS)
 
 test:
-	go test -v ./...
+	go test -v $(SRCS)
