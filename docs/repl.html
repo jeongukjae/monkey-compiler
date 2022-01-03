@@ -1,0 +1,59 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monkey Compiler Web</title>
+    <style>
+        html, body {
+            margin:0;
+            background-color: #000;;
+        }
+        #root {
+            width: 100vw;
+            height: 100vh;
+        }
+        #terminal {
+            max-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <article id='root'>
+        <div id='terminal'>
+        </div>
+    </article>
+    <link href="https://unpkg.com/jquery.terminal/css/jquery.terminal.min.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://unpkg.com/jquery.terminal/js/jquery.terminal.min.js"></script>
+    <script src="wasm_exec.js"></script>
+    <script>
+        if (!WebAssembly.instantiateStreaming) {
+			WebAssembly.instantiateStreaming = async (resp, importObject) => {
+				const source = await (await resp).arrayBuffer();
+				return await WebAssembly.instantiate(source, importObject);
+			};
+		}
+
+        const go = new Go();
+        let mod, inst;
+        WebAssembly.instantiateStreaming(fetch("./repl_lib.wasm"), go.importObject).then(
+            async result => {
+                mod = result.module;
+                inst = result.instance;
+                await go.run(inst);
+            }
+        );
+
+        $(document).ready(function () {
+            $('#terminal').terminal(function(command) {
+                this.echo(writeCommand(command))
+            }, {
+                greetings: "Hello! This is the Monkey programming language!\nFeel free to type in commands!!\n",
+                height: '100%',
+                width: '100%',
+                prompt: 'monkey> '
+            });
+        });
+    </script>
+</body>
+</html>
