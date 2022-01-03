@@ -21,7 +21,7 @@ func TestIntegerVm(t *testing.T) {
 	tests := []vmTestCase{
 		{"1", 1},
 		{"2", 2},
-		{"1 + 2", 2}, // TODO
+		{"1 + 2", 3},
 	}
 
 	for _, tt := range tests {
