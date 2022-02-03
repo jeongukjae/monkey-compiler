@@ -179,6 +179,45 @@ func TestBooleanExpressions(t *testing.T) {
 	}
 }
 
+func TestConditionals(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+			if (true) {10;}3333;
+			`,
+			expectedConstants: []interface{}{10, 3333},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpTrue),
+				code.Make(code.OpJumpNotTruthy, 7),
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpPop), // 7
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input: `
+			if (true) {10;} else {20}; 3333;
+			`,
+			expectedConstants: []interface{}{10, 20, 3333},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpTrue),
+				code.Make(code.OpJumpNotTruthy, 10),
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpJump, 13),
+				code.Make(code.OpConstant, 1), // 10
+				code.Make(code.OpPop),         // 13
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpPop),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		runCompilerTests(t, tt)
+	}
+}
+
 // Helper functions
 func runCompilerTests(t *testing.T, tt compilerTestCase) {
 	t.Helper()
@@ -200,7 +239,7 @@ func testInstructions(
 ) {
 	concatenated := concatInstruction(expected)
 
-	require.Equal(t, len(concatenated), len(actual), "wrong instructions length")
+	require.Equal(t, len(concatenated), len(actual), "wrong instructions length\n  expected: \n%s\n  got: \n%s", concatenated, actual)
 	require.ElementsMatch(t, concatenated, actual, "wrong instruction")
 }
 
