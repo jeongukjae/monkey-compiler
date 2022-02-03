@@ -67,6 +67,7 @@ func TestBooleanExpressions(t *testing.T) {
 		{"!!true", true},
 		{"!!false", false},
 		{"!!5", true},
+		{"!(if (false) {5;})", true},
 	}
 
 	for _, tt := range tests {
@@ -83,6 +84,9 @@ func TestConditionals(t *testing.T) {
 		{"if (1 < 2) {10}", 10},
 		{"if (1 < 2) {10} else {20}", 10},
 		{"if (1 > 2) {10} else {20}", 20},
+		{"if (1 > 2) {10}", Null},
+		{"if (false) {10}", Null},
+		{"if ((if(false) {true})) {10} else {20}", 20},
 	}
 
 	for _, tt := range tests {
@@ -121,6 +125,8 @@ func testExpectObject(t *testing.T, expected interface{}, actual object.Object) 
 		testIntegerObject(t, int64(expected), actual)
 	case bool:
 		testBooleanObject(t, bool(expected), actual)
+	case *object.Null:
+		require.Equal(t, Null, actual, "object is not Null")
 	}
 }
 
