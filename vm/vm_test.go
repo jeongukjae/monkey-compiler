@@ -42,7 +42,7 @@ func runVmTest(t *testing.T, tt vmTestCase) {
 	err = vm.Run()
 	require.Nil(t, err, "vm error")
 
-	stackElem := vm.StackTop()
+	stackElem := vm.LastPoppedStackElement()
 	testExpectObject(t, tt.expected, stackElem)
 }
 

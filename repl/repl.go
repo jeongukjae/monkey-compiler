@@ -71,7 +71,7 @@ func StartChannel(in chan string, out chan string) {
 			out <- fmt.Sprintf("Woops! Executing bytecode failed:\n%s\n", err)
 		}
 
-		stackTop := machine.StackTop()
+		stackTop := machine.LastPoppedStackElement()
 		out <- stackTop.Inspect() + "\n"
 	}
 }
