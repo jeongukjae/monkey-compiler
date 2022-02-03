@@ -36,6 +36,17 @@ func TestIntegerVm(t *testing.T) {
 	}
 }
 
+func TestBooleanExpressions(t *testing.T) {
+	tests := []vmTestCase{
+		{"true", true},
+		{"false", false},
+	}
+
+	for _, tt := range tests {
+		runVmTest(t, tt)
+	}
+}
+
 func runVmTest(t *testing.T, tt vmTestCase) {
 	t.Helper()
 
@@ -65,11 +76,19 @@ func testExpectObject(t *testing.T, expected interface{}, actual object.Object) 
 	switch expected := expected.(type) {
 	case int:
 		testIntegerObject(t, int64(expected), actual)
+	case bool:
+		testBooleanObject(t, bool(expected), actual)
 	}
 }
 
 func testIntegerObject(t *testing.T, expected int64, actual object.Object) {
 	result, ok := actual.(*object.Integer)
+	require.True(t, ok)
+	require.Equal(t, expected, result.Value, "object has wrong value")
+}
+
+func testBooleanObject(t *testing.T, expected bool, actual object.Object) {
+	result, ok := actual.(*object.Boolean)
 	require.True(t, ok)
 	require.Equal(t, expected, result.Value, "object has wrong value")
 }
