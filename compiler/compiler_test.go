@@ -268,6 +268,33 @@ func TestGlobalLetStatements(t *testing.T) {
 	}
 }
 
+func TestStringExpressions(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input:             `"monkey"`,
+			expectedConstants: []interface{}{"monkey"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input:             `"mon" + "key"`,
+			expectedConstants: []interface{}{"mon", "key"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpAdd),
+				code.Make(code.OpPop),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		runCompilerTests(t, tt)
+	}
+}
+
 // Helper functions
 func runCompilerTests(t *testing.T, tt compilerTestCase) {
 	t.Helper()
@@ -304,12 +331,20 @@ func testConstants(
 		switch constant := constant.(type) {
 		case int:
 			testIntegerObject(t, int64(constant), actual[i])
+		case string:
+			testStringObject(t, constant, actual[i])
 		}
 	}
 }
 
 func testIntegerObject(t *testing.T, expected int64, actual object.Object) {
 	result, ok := actual.(*object.Integer)
+	require.True(t, ok)
+	require.Equal(t, expected, result.Value, "object has wrong value")
+}
+
+func testStringObject(t *testing.T, expected string, actual object.Object) {
+	result, ok := actual.(*object.String)
 	require.True(t, ok)
 	require.Equal(t, expected, result.Value, "object has wrong value")
 }
