@@ -10,6 +10,7 @@ import (
 	"monkey/object"
 	"monkey/parser"
 	"monkey/vm"
+	"strings"
 )
 
 const PROMPT = ">> "
@@ -41,7 +42,12 @@ func Start(in io.Reader, out io.Writer) {
 		if !scanned {
 			return
 		}
-		inChan <- scanner.Text()
+		line := scanner.Text()
+		if strings.Trim(line, "\t ") == "" {
+			continue
+		}
+
+		inChan <- line
 		output := <-outChan
 		io.WriteString(out, output)
 	}
