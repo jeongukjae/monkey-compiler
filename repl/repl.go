@@ -7,6 +7,7 @@ import (
 	"io"
 	"monkey/compiler"
 	"monkey/lexer"
+	"monkey/object"
 	"monkey/parser"
 	"monkey/vm"
 )
@@ -47,6 +48,10 @@ func Start(in io.Reader, out io.Writer) {
 }
 
 func StartChannel(in chan string, out chan string) {
+	constants := []object.Object{}
+	globals := make([]object.Object, 10)
+	symbolTable := compiler.NewSymbolTable()
+
 	for {
 		line := <-in
 
@@ -58,14 +63,17 @@ func StartChannel(in chan string, out chan string) {
 			continue
 		}
 
-		comp := compiler.New()
+		comp := compiler.NewWithState(symbolTable, constants)
 		err := comp.Compile(program)
 		if err != nil {
 			out <- fmt.Sprintf("Woops! Compilation failed:\n%s\n", err)
 			continue
 		}
 
-		machine := vm.New(comp.Bytecode())
+		code := comp.Bytecode()
+		constants = code.Constants
+
+		machine := vm.NewWithGlobalState(code, globals)
 		err = machine.Run()
 		if err != nil {
 			out <- fmt.Sprintf("Woops! Executing bytecode failed:\n%s\n", err)
