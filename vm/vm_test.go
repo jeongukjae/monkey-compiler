@@ -106,6 +106,18 @@ func TestGlobalLetStatements(t *testing.T) {
 	}
 }
 
+func TestStringExpressions(t *testing.T) {
+	tests := []vmTestCase{
+		{`"monkey"`, "monkey"},
+		{`"mon" +"key"`, "monkey"},
+		{`"mon" +"key" + "banana"`, "monkeybanana"},
+	}
+
+	for _, tt := range tests {
+		runVmTest(t, tt)
+	}
+}
+
 func runVmTest(t *testing.T, tt vmTestCase) {
 	t.Helper()
 
@@ -139,6 +151,8 @@ func testExpectObject(t *testing.T, expected interface{}, actual object.Object) 
 		testBooleanObject(t, bool(expected), actual)
 	case *object.Null:
 		require.Equal(t, Null, actual, "object is not Null")
+	case string:
+		testStringObject(t, expected, actual)
 	}
 }
 
@@ -150,6 +164,12 @@ func testIntegerObject(t *testing.T, expected int64, actual object.Object) {
 
 func testBooleanObject(t *testing.T, expected bool, actual object.Object) {
 	result, ok := actual.(*object.Boolean)
+	require.True(t, ok)
+	require.Equal(t, expected, result.Value, "object has wrong value")
+}
+
+func testStringObject(t *testing.T, expected string, actual object.Object) {
+	result, ok := actual.(*object.String)
 	require.True(t, ok)
 	require.Equal(t, expected, result.Value, "object has wrong value")
 }
