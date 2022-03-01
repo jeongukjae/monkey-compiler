@@ -130,6 +130,30 @@ func TestArrayLiterals(t *testing.T) {
 	}
 }
 
+func TestHashLiterals(t *testing.T) {
+	tests := []vmTestCase{
+		{"{}", map[object.HashKey]int64{}},
+		{
+			"{1:2,2:3}",
+			map[object.HashKey]int64{
+				(&object.Integer{Value: 1}).HashKey(): 2,
+				(&object.Integer{Value: 2}).HashKey(): 3,
+			},
+		},
+		{
+			"{1 + 1:2*2, 3+3:4*4}",
+			map[object.HashKey]int64{
+				(&object.Integer{Value: 2}).HashKey(): 4,
+				(&object.Integer{Value: 6}).HashKey(): 16,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		runVmTest(t, tt)
+	}
+}
+
 // helper functions
 func runVmTest(t *testing.T, tt vmTestCase) {
 	t.Helper()
@@ -168,6 +192,8 @@ func testExpectObject(t *testing.T, expected interface{}, actual object.Object) 
 		testStringObject(t, expected, actual)
 	case []int:
 		testIntegerArrayObject(t, expected, actual)
+	case map[object.HashKey]int64:
+		testIntegerHashObject(t, expected, actual)
 	}
 }
 
@@ -195,5 +221,15 @@ func testIntegerArrayObject(t *testing.T, expected []int, actual object.Object) 
 	require.Equal(t, len(expected), len(result.Elements), "wrong number of elements")
 	for i, expectedElement := range expected {
 		testIntegerObject(t, int64(expectedElement), result.Elements[i])
+	}
+}
+func testIntegerHashObject(t *testing.T, expected map[object.HashKey]int64, actual object.Object) {
+	result, ok := actual.(*object.Hash)
+	require.True(t, ok)
+	require.Equal(t, len(expected), len(result.Pairs), "wrong number of elements")
+	for key, value := range expected {
+		pair, ok := result.Pairs[key]
+		require.True(t, ok, "no pair for given key")
+		testIntegerObject(t, value, pair.Value)
 	}
 }
