@@ -118,6 +118,19 @@ func TestStringExpressions(t *testing.T) {
 	}
 }
 
+func TestArrayLiterals(t *testing.T) {
+	tests := []vmTestCase{
+		{"[]", []int{}},
+		{"[1,2,3]", []int{1, 2, 3}},
+		{"[1 +2, 3*4, 5 +6]", []int{3, 12, 11}},
+	}
+
+	for _, tt := range tests {
+		runVmTest(t, tt)
+	}
+}
+
+// helper functions
 func runVmTest(t *testing.T, tt vmTestCase) {
 	t.Helper()
 
@@ -153,6 +166,8 @@ func testExpectObject(t *testing.T, expected interface{}, actual object.Object) 
 		require.Equal(t, Null, actual, "object is not Null")
 	case string:
 		testStringObject(t, expected, actual)
+	case []int:
+		testIntegerArrayObject(t, expected, actual)
 	}
 }
 
@@ -172,4 +187,13 @@ func testStringObject(t *testing.T, expected string, actual object.Object) {
 	result, ok := actual.(*object.String)
 	require.True(t, ok)
 	require.Equal(t, expected, result.Value, "object has wrong value")
+}
+
+func testIntegerArrayObject(t *testing.T, expected []int, actual object.Object) {
+	result, ok := actual.(*object.Array)
+	require.True(t, ok)
+	require.Equal(t, len(expected), len(result.Elements), "wrong number of elements")
+	for i, expectedElement := range expected {
+		testIntegerObject(t, int64(expectedElement), result.Elements[i])
+	}
 }
