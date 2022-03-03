@@ -388,7 +388,6 @@ func TestHashLiterals(t *testing.T) {
 }
 
 func TestIndexExpressions(t *testing.T) {
-
 	tests := []compilerTestCase{
 		{
 			input:             "[1,2,3][1 + 1]",
@@ -424,6 +423,54 @@ func TestIndexExpressions(t *testing.T) {
 	for _, tt := range tests {
 		runCompilerTests(t, tt)
 	}
+}
+
+func TestFunctions(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `fn() {return 5+10}`,
+			expectedConstants: []interface{}{
+				5,
+				10,
+				[]code.Instructions{
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpAdd),
+					code.Make(code.OpReturnValue),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpPop),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		runCompilerTests(t, tt)
+	}
+}
+
+func TestCompilerScopes(t *testing.T) {
+	compiler := New()
+	require.Equal(t, 0, compiler.scopeIndex, "wrong scopeIndex")
+
+	compiler.emit(code.OpMul)
+
+	compiler.enterScope()
+	require.Equal(t, 1, compiler.scopeIndex, "wrong scopeIndex")
+
+	compiler.emit(code.OpSub)
+	require.Equal(t, 1, len(compiler.scopes[compiler.scopeIndex].instructions), "wrong instruction length")
+	require.Equal(t, code.OpSub, compiler.scopes[compiler.scopeIndex].lastInstruction.Opcode, "wrong last ins")
+
+	compiler.leaveScope()
+	require.Equal(t, 0, compiler.scopeIndex, "wrong scopeIndex")
+
+	compiler.emit(code.OpAdd)
+	require.Equal(t, 2, len(compiler.scopes[compiler.scopeIndex].instructions), "wrong instruction length")
+	require.Equal(t, code.OpAdd, compiler.scopes[compiler.scopeIndex].lastInstruction.Opcode, "wrong last ins")
+	require.Equal(t, code.OpMul, compiler.scopes[compiler.scopeIndex].previousInstruction.Opcode, "wrong previous ins")
 }
 
 // Helper functions
@@ -464,6 +511,10 @@ func testConstants(
 			testIntegerObject(t, int64(constant), actual[i])
 		case string:
 			testStringObject(t, constant, actual[i])
+		case []code.Instructions:
+			fn, ok := actual[i].(*object.CompiledFunction)
+			require.True(t, ok, "constant is not a function")
+			testInstructions(t, constant, fn.Instructions)
 		}
 	}
 }
