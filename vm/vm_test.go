@@ -228,6 +228,14 @@ func TestCallingFunctionsWithoutArguments(t *testing.T) {
 			`,
 			expected: Null,
 		},
+		{
+			input: `
+			let return1 = fn() {1};
+			let returnReturn1 = fn() {return1};
+			returnReturn1()();
+			`,
+			expected: 1,
+		},
 	}
 
 	for _, tt := range tests {
