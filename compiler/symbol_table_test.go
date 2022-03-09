@@ -149,3 +149,98 @@ func TestDefineResolveBuiltins(t *testing.T) {
 		}
 	}
 }
+
+func TestResolveFree(t *testing.T) {
+	global := NewSymbolTable()
+	global.Define("a")
+	global.Define("b")
+
+	firstLocal := NewEnclosedSymbolTable(global)
+	firstLocal.Define("c")
+	firstLocal.Define("d")
+
+	secondLocal := NewEnclosedSymbolTable(firstLocal)
+	secondLocal.Define("e")
+	secondLocal.Define("f")
+
+	tests := []struct {
+		table               *SymbolTable
+		expectedSymbols     []Symbol
+		expectedFreeSymbols []Symbol
+	}{
+		{
+			firstLocal,
+			[]Symbol{
+				{Name: "a", Scope: GlobalScope, Index: 0},
+				{Name: "b", Scope: GlobalScope, Index: 1},
+				{Name: "c", Scope: LocalScope, Index: 0},
+				{Name: "d", Scope: LocalScope, Index: 1},
+			},
+			[]Symbol{},
+		},
+		{
+			secondLocal,
+			[]Symbol{
+				{Name: "a", Scope: GlobalScope, Index: 0},
+				{Name: "b", Scope: GlobalScope, Index: 1},
+				{Name: "c", Scope: FreeScope, Index: 0},
+				{Name: "d", Scope: FreeScope, Index: 1},
+				{Name: "e", Scope: LocalScope, Index: 0},
+				{Name: "f", Scope: LocalScope, Index: 1},
+			},
+			[]Symbol{
+				{Name: "c", Scope: LocalScope, Index: 0},
+				{Name: "d", Scope: LocalScope, Index: 1},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		for _, sym := range tt.expectedSymbols {
+			result, ok := tt.table.Resolve(sym.Name)
+			require.True(t, ok)
+			require.Equal(t, sym, result)
+		}
+
+		require.Equal(t, len(tt.expectedFreeSymbols), len(tt.table.FreeSymbols))
+		for i, sym := range tt.expectedFreeSymbols {
+			result := tt.table.FreeSymbols[i]
+			require.Equal(t, sym, result)
+		}
+	}
+}
+
+func TestResolveUnresolveableFree(t *testing.T) {
+	global := NewSymbolTable()
+	global.Define("a")
+
+	firstLocal := NewEnclosedSymbolTable(global)
+	firstLocal.Define("c")
+
+	secondLocal := NewEnclosedSymbolTable(firstLocal)
+	secondLocal.Define("e")
+	secondLocal.Define("f")
+
+	expected := []Symbol{
+		{Name: "a", Scope: GlobalScope, Index: 0},
+		{Name: "c", Scope: FreeScope, Index: 0},
+		{Name: "e", Scope: LocalScope, Index: 0},
+		{Name: "f", Scope: LocalScope, Index: 1},
+	}
+
+	for _, sym := range expected {
+		result, ok := secondLocal.Resolve(sym.Name)
+		require.True(t, ok)
+		require.Equal(t, sym, result)
+	}
+
+	expectedUnresolvable := []string{
+		"b",
+		"d",
+	}
+
+	for _, name := range expectedUnresolvable {
+		_, ok := secondLocal.Resolve(name)
+		require.False(t, ok)
+	}
+}
