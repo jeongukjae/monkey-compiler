@@ -37,12 +37,31 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">Monkey Compiler</a>
+            <a class="navbar-brand" href="#">Monkey Compiler</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/jeongukjae/monkey-compiler">GitHub Repo (Compiler)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/jeongukjae/monkey-interpreter">GitHub Repo (Interpreter)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://jeongukjae.github.io/monkey-compiler/repl.html">Repl (Compiler)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://jeongukjae.github.io/monkey-interpreter/">Repl (Interpreter)</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
-
     <div class="container">
         <select class="form-select" aria-label="Default select example" id="template">
             <option value="default">Default</option>
@@ -105,6 +124,13 @@ puts(getName(people[1])); # => "Bob"</textarea>
                 Elapsed Time (milliseconds)
             </div>
             <ul class="list-group list-group-flush" id="elapsed-time"></ul>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                Compile Result
+            </div>
+            <ul class="list-group list-group-flush" id="compile-result"></ul>
         </div>
     </div>
 
@@ -182,6 +208,10 @@ puts(getName(people[1])); # => "Bob"`
 
                 $("#output").text(out.trim());
                 $("#result").text(output["Result"]);
+                $("#compile-result").html(`
+                    <li class="list-group-item"><p>Constants</p><pre>${output["Constants"].trim()}</pre></li>
+                    <li class="list-group-item"><p>Instructions</p><pre>${output["Instructions"].trim()}</pre></li>
+                `);
                 $("#error").text(output["ErrorString"]);
                 $("#elapsed-time").html(`
                     <li class="list-group-item">Compile: ${output["ElapsedTimeCompilation"]}</li>

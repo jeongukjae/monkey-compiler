@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 	"syscall/js"
@@ -27,6 +28,8 @@ func main() {
 
 		result := map[string]interface{}{
 			"ErrorString":            "",
+			"Instructions":           "",
+			"Constants":              "",
 			"ElapsedTimeCompilation": -1,
 			"ElapsedTimeVMInit":      -1,
 			"ElapsedTimeRuntime":     -1,
@@ -46,8 +49,16 @@ func main() {
 		}
 		result["ElapsedTimeCompilation"] = time.Since(start).Milliseconds()
 
+		bytecode := comp.Bytecode()
+		result["Instructions"] = fmt.Sprintf("%s", bytecode.Instructions)
+		var consts bytes.Buffer
+		for index, constant := range bytecode.Constants {
+			consts.WriteString(fmt.Sprintf("%d: %s (%s)\n", index, constant.Inspect()))
+		}
+		result["Constants"] = consts.String()
+
 		start = time.Now()
-		machine := vm.New(comp.Bytecode())
+		machine := vm.New(bytecode)
 		result["ElapsedTimeVMInit"] = time.Since(start).Milliseconds()
 
 		start = time.Now()
