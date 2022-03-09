@@ -53,7 +53,7 @@ func main() {
 		result["Instructions"] = fmt.Sprintf("%s", bytecode.Instructions)
 		var consts bytes.Buffer
 		for index, constant := range bytecode.Constants {
-			consts.WriteString(fmt.Sprintf("%d: %s (%s)\n", index, constant.Inspect()))
+			consts.WriteString(fmt.Sprintf("%d: %s\n", index, constant.Inspect()))
 		}
 		result["Constants"] = consts.String()
 
