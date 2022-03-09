@@ -27,13 +27,13 @@ func main() {
 		}
 
 		result := map[string]interface{}{
-			"ErrorString":            "",
 			"Instructions":           "",
 			"Constants":              "",
+			"Result":                 "",
+			"ErrorString":            "",
 			"ElapsedTimeCompilation": -1,
 			"ElapsedTimeVMInit":      -1,
 			"ElapsedTimeRuntime":     -1,
-			"Result":                 "",
 		}
 
 		start := time.Now()
