@@ -250,7 +250,7 @@ func TestBuiltinFunction(t *testing.T) {
 		{`len("")`, 0},
 		{`len("four")`, 4},
 		{`len("hello world")`, 11},
-		{`len(2)`, "argument to len not supported, got INTEGER"},
+		{`len(2)`, "argument to `len` not supported, got INTEGER"},
 		{`len("one", "two")`, "wrong number of arguments. got=2, want=1"},
 	}
 
