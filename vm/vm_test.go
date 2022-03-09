@@ -173,7 +173,7 @@ func TestIndexExpressions(t *testing.T) {
 	}
 }
 
-func TestCallingFunctionsWithoutArguments(t *testing.T) {
+func TestCallingFunctions(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input: `
@@ -233,6 +233,16 @@ func TestCallingFunctionsWithoutArguments(t *testing.T) {
 			let return1 = fn() {1};
 			let returnReturn1 = fn() {return1};
 			returnReturn1()();
+			`,
+			expected: 1,
+		},
+		{
+			input: `
+			let returnsOneReturner = fn() {
+				let returnsOne = fn() {1;};
+				returnsOne
+			}
+			returnsOneReturner()();
 			`,
 			expected: 1,
 		},
