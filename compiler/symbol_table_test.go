@@ -244,3 +244,26 @@ func TestResolveUnresolveableFree(t *testing.T) {
 		require.False(t, ok)
 	}
 }
+
+func TestDefineAndResolveFunctionName(t *testing.T) {
+	global := NewSymbolTable()
+	global.DefineFunctionName("a")
+
+	expected := Symbol{Name: "a", Scope: FunctionScope, Index: 0}
+
+	result, ok := global.Resolve(expected.Name)
+	require.True(t, ok)
+	require.Equal(t, expected, result)
+}
+
+func TestShadowingFunctionName(t *testing.T) {
+	global := NewSymbolTable()
+	global.DefineFunctionName("a")
+	global.Define("a")
+
+	expected := Symbol{Name: "a", Scope: GlobalScope, Index: 0}
+
+	result, ok := global.Resolve(expected.Name)
+	require.True(t, ok)
+	require.Equal(t, expected, result)
+}
