@@ -57,6 +57,9 @@ func StartChannel(in chan string, out chan string) {
 	constants := []object.Object{}
 	globals := make([]object.Object, 10)
 	symbolTable := compiler.NewSymbolTable()
+	for i, v := range object.Builtins {
+		symbolTable.DefineBuiltin(i, v.Name)
+	}
 
 	for {
 		line := <-in
