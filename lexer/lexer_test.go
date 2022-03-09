@@ -24,6 +24,8 @@ if (5 < 10) {
 } else {
 	return false;
 }
+# this should be ignored
+# this should be ignored too
 
 10 == 10;
 10 != 9;
@@ -31,6 +33,8 @@ if (5 < 10) {
 "foo bar";
 [1, 2];
 {"foo":"bar"}
+
+# this should be ignored
 `
 
 	testTokens := []struct {
