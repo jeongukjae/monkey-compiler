@@ -4,9 +4,12 @@ Implement [a compiler for the Monkey programming language](https://compilerbook.
 
 * [interpreter implementation](https://github.com/jeongukjae/monkey-interpreter)
 
-## Run REPL in Web
+## Wasm builds
 
-I built a web page with WebAssembly to use REPL in web. Check out [this page](https://jeongukjae.github.io/monkey-compiler/repl.html).
+I built web pages with WebAssembly to use monkey compiler in web. Check out below pages.
+
+* [REPL https://jeongukjae.github.io/monkey-compiler/repl.html](https://jeongukjae.github.io/monkey-compiler/repl.html).
+* [Compiler https://jeongukjae.github.io/monkey-compiler/](https://jeongukjae.github.io/monkey-compiler/).
 
 ## Run REPL
 
