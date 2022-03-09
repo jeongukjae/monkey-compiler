@@ -433,6 +433,24 @@ func TestParsingHashLiterals(t *testing.T) {
 	}
 }
 
+func TestFunctionLiteralWithName(t *testing.T) {
+	input := `let myFunction = fn() { } `
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	testParserErrors(t, p)
+
+	require.Equal(t, 1, len(program.Statements))
+	stmt, ok := program.Statements[0].(*ast.LetStatement)
+	require.True(t, ok)
+
+	function, ok := stmt.Value.(*ast.FunctionLiteral)
+	require.True(t, ok)
+
+	require.Equal(t, "myFunction", function.Name)
+}
+
 // Helper functionss
 //
 func testParserErrors(t *testing.T, p *Parser) {
