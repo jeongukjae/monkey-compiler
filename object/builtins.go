@@ -25,17 +25,6 @@ var Builtins = []struct {
 		},
 	},
 	{
-		"type",
-		&Builtin{
-			Fn: func(args ...Object) Object {
-				if len(args) != 1 {
-					return newError("wrong number of arguments. got=%d, want=1", len(args))
-				}
-				return &ObjectTypeObject{Value: args[0].Type()}
-			},
-		},
-	},
-	{
 		"puts",
 		&Builtin{
 			Fn: func(args ...Object) Object {
@@ -124,6 +113,18 @@ var Builtins = []struct {
 				newElements[length] = args[1]
 
 				return &Array{Elements: newElements}
+			},
+		},
+	},
+
+	{
+		"type",
+		&Builtin{
+			Fn: func(args ...Object) Object {
+				if len(args) != 1 {
+					return newError("wrong number of arguments. got=%d, want=1", len(args))
+				}
+				return &ObjectTypeObject{Value: args[0].Type()}
 			},
 		},
 	},
