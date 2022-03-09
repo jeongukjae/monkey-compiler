@@ -535,11 +535,12 @@ func TestFunctionCalls(t *testing.T) {
 		},
 		{
 			input: `
-			let oneArg = fn(a) {};
+			let oneArg = fn(a) {a};
 			oneArg(24);`,
 			expectedConstants: []interface{}{
 				[]code.Instructions{
-					code.Make(code.OpReturn),
+					code.Make(code.OpGetLocal, 0),
+					code.Make(code.OpReturnValue),
 				},
 				24,
 			},
@@ -554,11 +555,16 @@ func TestFunctionCalls(t *testing.T) {
 		},
 		{
 			input: `
-			let multiArgs = fn(a, b, c) {};
+			let multiArgs = fn(a, b, c) {a; b; c};
 			multiArgs(24, 25, 26);`,
 			expectedConstants: []interface{}{
 				[]code.Instructions{
-					code.Make(code.OpReturn),
+					code.Make(code.OpGetLocal, 0),
+					code.Make(code.OpPop),
+					code.Make(code.OpGetLocal, 1),
+					code.Make(code.OpPop),
+					code.Make(code.OpGetLocal, 2),
+					code.Make(code.OpReturnValue),
 				},
 				24,
 				25,
